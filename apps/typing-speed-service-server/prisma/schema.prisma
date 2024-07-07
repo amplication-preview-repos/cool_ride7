@@ -1,0 +1,53 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TypingTest {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  name          String?
+  typingResults TypingResult[]
+}
+
+model TypingResult {
+  id             String        @id @default(cuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  wordsPerMinute Int?
+  accuracy       Float?
+  typingErrors   TypingError[]
+  user           User?         @relation(fields: [userId], references: [id])
+  userId         String?
+  typingTest     TypingTest?   @relation(fields: [typingTestId], references: [id])
+  typingTestId   String?
+}
+
+model TypingError {
+  id             String        @id @default(cuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  errorText      String?
+  position       Int?
+  typingResult   TypingResult? @relation(fields: [typingResultId], references: [id])
+  typingResultId String?
+}
+
+model User {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  firstName     String?
+  lastName      String?
+  username      String         @unique
+  email         String?        @unique
+  password      String
+  roles         Json
+  avatar        Json?
+  typingResults TypingResult[]
+}
